@@ -1,0 +1,13 @@
+{
+  "name": "onmaeul-chuseok",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "node dev.cjs",
+    "build": "node build.cjs",
+    "test": "node test.cjs"
+  }
+}

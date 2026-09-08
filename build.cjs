@@ -1,0 +1,1 @@
+const fs=require('fs'),vm=require('vm');const html=fs.readFileSync(__dirname+'/index.html','utf8');new vm.Script(html.match(/<script>([\s\S]*?)<\/script>/)[1]);fs.mkdirSync(__dirname+'/dist',{recursive:true});fs.writeFileSync(__dirname+'/dist/index.html',html);console.log('Build complete');

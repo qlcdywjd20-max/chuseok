@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "framework": null,
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/control",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/display",
+      "destination": "/index.html"
+    }
+  ]
+}
