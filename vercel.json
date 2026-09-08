@@ -5,11 +5,19 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/control",
+      "source": "/game",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/admin",
       "destination": "/index.html"
     },
     {
       "source": "/display",
+      "destination": "/index.html"
+    },
+    {
+      "source": "/control",
       "destination": "/index.html"
     }
   ]

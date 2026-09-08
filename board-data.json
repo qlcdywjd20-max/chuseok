@@ -1,0 +1,341 @@
+[
+  {
+    "id": 1,
+    "type": "chuseok",
+    "title": "풍성한 한가위",
+    "choices": [
+      "떡국",
+      "팥빙수",
+      "붕어빵",
+      "송편"
+    ],
+    "answer": "송편",
+    "duration": 20,
+    "enabled": true,
+    "question": "추석에 먹는 대표적인 음식은?"
+  },
+  {
+    "id": 2,
+    "type": "town",
+    "title": "정겨운 우리동네",
+    "choices": [
+      "목욕탕",
+      "정류장",
+      "도서관",
+      "우체국"
+    ],
+    "answer": "도서관",
+    "duration": 20,
+    "enabled": true,
+    "question": "우리 동네에서 책을 빌려 읽는 곳은?"
+  },
+  {
+    "id": 3,
+    "type": "memory",
+    "title": "그때 그 시절",
+    "choices": [
+      "체",
+      "다듬이방망이",
+      "주걱",
+      "국자"
+    ],
+    "answer": "다듬이방망이",
+    "duration": 20,
+    "enabled": true,
+    "question": "옛날에 옷감을 두드려 펴던 도구는?"
+  },
+  {
+    "id": 4,
+    "type": "song",
+    "title": "노래 한 소절",
+    "prompt": "♪ 「고향의 봄」 첫 소절을\n다 함께 불러주세요!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 5,
+    "type": "mission",
+    "title": "사랑을 모아 하트!",
+    "prompt": "우리 팀 모두 머리 위로\n커다란 하트를 만들어주세요!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 6,
+    "type": "chance",
+    "title": "복주머니가 열렸어요!",
+    "prompt": "옆 사람에게 따뜻한 덕담 한마디!\n“올 추석도 행복하세요!”",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 7,
+    "type": "special",
+    "title": "관장님이 쏜다!",
+    "prompt": "[점수:2] 관장님이 쏜다!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 8,
+    "type": "town",
+    "title": "정겨운 우리동네",
+    "choices": [
+      "우체국",
+      "미용실",
+      "빵집",
+      "도서관"
+    ],
+    "answer": "우체국",
+    "duration": 20,
+    "enabled": true,
+    "question": "편지나 소포를 보내는 곳은?"
+  },
+  {
+    "id": 9,
+    "type": "song",
+    "title": "흥겨운 노래 한 소절",
+    "prompt": "♪ 「아리랑」 한 소절을\n박수에 맞춰 함께 불러주세요!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 10,
+    "type": "memory",
+    "title": "그때 그 시절",
+    "choices": [
+      "제기",
+      "공기돌",
+      "연",
+      "팽이"
+    ],
+    "answer": "연",
+    "duration": 20,
+    "enabled": true,
+    "question": "종이와 대나무 살로 만들어 하늘에 날리는 것은?"
+  },
+  {
+    "id": 11,
+    "type": "chuseok",
+    "title": "풍성한 한가위",
+    "choices": [
+      "설날",
+      "한가위",
+      "단오",
+      "동지"
+    ],
+    "answer": "한가위",
+    "duration": 20,
+    "enabled": true,
+    "question": "추석의 다른 이름은 무엇일까요?"
+  },
+  {
+    "id": 12,
+    "type": "cheer",
+    "title": "다 함께 응원타임!",
+    "prompt": "우리 팀도, 옆 팀도 힘내세요!\n다 함께 박수 치며 응원해요!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 13,
+    "type": "memory",
+    "title": "그때 그 시절",
+    "choices": [
+      "커피",
+      "탄산수",
+      "레몬차",
+      "식혜"
+    ],
+    "answer": "식혜",
+    "duration": 20,
+    "enabled": true,
+    "question": "밥알이 동동 떠 있는 달콤한 전통 음료는?"
+  },
+  {
+    "id": 14,
+    "type": "chance",
+    "title": "웃음꽃이 피었습니다!",
+    "prompt": "옆 사람과 눈을 맞추고\n활짝 웃으며 인사해주세요!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 15,
+    "type": "mission",
+    "title": "우리 팀의 멋진 구호!",
+    "prompt": "우리 팀 이름을 함께 외치고\n“파이팅!”으로 마무리해주세요!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 16,
+    "type": "chuseok",
+    "title": "풍성한 한가위",
+    "choices": [
+      "보름달",
+      "초승달",
+      "반달",
+      "그믐달"
+    ],
+    "answer": "보름달",
+    "duration": 20,
+    "enabled": true,
+    "question": "추석 밤하늘에 뜨는 둥근 달은?"
+  },
+  {
+    "id": 17,
+    "type": "town",
+    "title": "정겨운 우리동네",
+    "choices": [
+      "횡단보도",
+      "주방",
+      "운동장",
+      "버스 정류장"
+    ],
+    "answer": "버스 정류장",
+    "duration": 20,
+    "enabled": true,
+    "question": "우리 동네에서 버스를 기다리는 곳은?"
+  },
+  {
+    "id": 18,
+    "type": "memory",
+    "title": "그때 그 시절",
+    "choices": [
+      "공기놀이",
+      "씨름",
+      "제기차기",
+      "윷놀이"
+    ],
+    "answer": "제기차기",
+    "duration": 20,
+    "enabled": true,
+    "question": "발로 톡톡 차며 즐기던 전통놀이는?"
+  },
+  {
+    "id": 19,
+    "type": "special",
+    "title": "구청장님이 쏜다!",
+    "prompt": "[한번더] 구청장님이 쏜다!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 20,
+    "type": "mission",
+    "title": "추석맞이 단체 노래!",
+    "prompt": "진행자가 준비한 추석맞이 노래를\n모두 함께 신나게 불러주세요!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 21,
+    "type": "chuseok",
+    "title": "풍성한 한가위",
+    "choices": [
+      "상추",
+      "김",
+      "배추",
+      "솔잎"
+    ],
+    "answer": "솔잎",
+    "duration": 20,
+    "enabled": true,
+    "question": "송편을 찔 때 밑에 깔아 향을 내는 것은?"
+  },
+  {
+    "id": 22,
+    "type": "town",
+    "title": "정겨운 우리동네",
+    "choices": [
+      "우체국",
+      "소방서",
+      "시장",
+      "수영장"
+    ],
+    "answer": "시장",
+    "duration": 20,
+    "enabled": true,
+    "question": "우리 동네에서 여러 가게가 모여 물건을 파는 곳은?"
+  },
+  {
+    "id": 23,
+    "type": "memory",
+    "title": "그때 그 시절",
+    "choices": [
+      "투호",
+      "강강술래",
+      "줄다리기",
+      "널뛰기"
+    ],
+    "answer": "강강술래",
+    "duration": 20,
+    "enabled": true,
+    "question": "손을 잡고 둥글게 돌며 즐기는 전통놀이는?"
+  },
+  {
+    "id": 24,
+    "type": "song",
+    "title": "고향을 떠올리는 시간",
+    "prompt": "좋아하는 고향 노래 한 소절을\n우리 팀 대표가 들려주세요!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 25,
+    "type": "chance",
+    "title": "칭찬 복주머니!",
+    "prompt": "우리 팀의 좋은 점을\n다 함께 한 가지씩 말해주세요!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 26,
+    "type": "special",
+    "title": "지회장님이 쏜다!",
+    "prompt": "[선물] 지회장님이 쏜다!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 27,
+    "type": "golden",
+    "title": "50개 경로당, 하나의 마음!",
+    "prompt": "모두 머리 위로 큰 하트를 만들고\n“풍성한 한가위 되세요!”를 외쳐주세요!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 28,
+    "type": "mission",
+    "title": "박수로 마음을 모아요!",
+    "prompt": "진행자의 박수 리듬을 듣고\n우리 팀 모두 똑같이 따라 해주세요!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  },
+  {
+    "id": 29,
+    "type": "chance",
+    "title": "행운의 추석 인사!",
+    "prompt": "다른 팀을 향해 손을 흔들며\n“건강하고 행복하세요!”라고 인사해주세요!",
+    "duration": 20,
+    "enabled": true,
+    "question": ""
+  }
+]

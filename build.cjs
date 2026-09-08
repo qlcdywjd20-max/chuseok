@@ -1,1 +1,10 @@
-const fs=require('fs'),vm=require('vm');const html=fs.readFileSync(__dirname+'/index.html','utf8');new vm.Script(html.match(/<script>([\s\S]*?)<\/script>/)[1]);fs.mkdirSync(__dirname+'/dist',{recursive:true});fs.writeFileSync(__dirname+'/dist/index.html',html);console.log('Build complete');
+const fs=require('fs'),path=require('path'),vm=require('vm');const root=__dirname;function build(){const read=p=>fs.readFileSync(path.join(root,p));let html=read('index.html').toString();
+const env={...process.env};const envPath=path.join(root,'.env.local');if(fs.existsSync(envPath)){for(const line of fs.readFileSync(envPath,'utf8').split(/\r?\n/)){const m=line.match(/^([A-Z_]+)=(.*)$/);if(m)env[m[1]]=m[2].trim().replace(/^['"]|['"]$/g,'');}}
+const config={url:env.VITE_SUPABASE_URL||'',key:env.VITE_SUPABASE_PUBLISHABLE_KEY||env.VITE_SUPABASE_ANON_KEY||''};
+if(config.key.startsWith('sb_secret_'))throw Error('secret key는 브라우저에 사용할 수 없습니다. publishable key를 넣으세요.');
+if(config.key.split('.').length===3){try{if(JSON.parse(Buffer.from(config.key.split('.')[1],'base64url')).role==='service_role')throw Error('service_role key는 사용할 수 없습니다.');}catch(e){if(e.message.includes('service_role'))throw e;}}
+const sdk=fs.readFileSync(path.join(root,'node_modules/@supabase/supabase-js/dist/umd/supabase.js'),'utf8');
+html=html.replace('/*APP*/',read('app.js').toString()+'\nconst CLOUD_CONFIG='+JSON.stringify(config)+';\n'+read('cloud.js').toString());
+html=html.replace('<script>','<script src="/supabase-client.js"></script><script>');
+fs.mkdirSync(path.join(root,'dist'),{recursive:true});fs.writeFileSync(path.join(root,'dist/supabase-client.js'),sdk);
+html=html.replace('/*BANK*/','const DEFAULT_BANK = '+JSON.stringify(JSON.parse(read('board-data.json')).map(({id,type,enabled})=>({id,type,enabled})))+';').replace('/*APP*/',read('app.js').toString());html=html.replace('<script>','<!-- Jua SIL OFL: '+read('Jua-OFL.txt').toString().replaceAll('--','—')+' -->\n<script>');new vm.Script(html.match(/<script>([\s\S]*?)<\/script>/)[1]);fs.mkdirSync(path.join(root,'dist'),{recursive:true});fs.writeFileSync(path.join(root,'dist/index.html'),html);return html;}if(require.main===module){build();console.log('Build complete: dist/index.html');}module.exports=build;
