@@ -11,6 +11,7 @@ function doGet() {
     const rows = values.filter(row => row[header.indexOf('칸번호')] !== '').map(row => {
       const item = {};
       HEADERS.forEach(name => { item[name] = row[header.indexOf(name)]; });
+      if (header.includes("배점")) item["배점"] = row[header.indexOf("배점")];
       return item;
     });
     return jsonOutput({rows: rows, updatedAt: new Date().toISOString()});
