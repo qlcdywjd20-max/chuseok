@@ -55,7 +55,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 10
+    "points": 15
   },
   {
     "id": 5,
@@ -65,7 +65,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 20
+    "points": 15
   },
   {
     "id": 6,
@@ -75,7 +75,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 30
+    "points": 20
   },
   {
     "id": 7,
@@ -85,7 +85,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 30
+    "points": 20
   },
   {
     "id": 8,
@@ -111,7 +111,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 10
+    "points": 15
   },
   {
     "id": 10,
@@ -179,7 +179,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 30
+    "points": 20
   },
   {
     "id": 15,
@@ -189,7 +189,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 20
+    "points": 15
   },
   {
     "id": 16,
@@ -247,7 +247,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 30
+    "points": 20
   },
   {
     "id": 20,
@@ -257,7 +257,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 20
+    "points": 15
   },
   {
     "id": 21,
@@ -315,7 +315,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 10
+    "points": 15
   },
   {
     "id": 25,
@@ -325,7 +325,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 30
+    "points": 20
   },
   {
     "id": 26,
@@ -335,7 +335,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 30
+    "points": 20
   },
   {
     "id": 27,
@@ -355,7 +355,7 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 20
+    "points": 15
   },
   {
     "id": 29,
@@ -365,6 +365,6 @@
     "duration": 20,
     "enabled": true,
     "question": "",
-    "points": 30
+    "points": 20
   }
 ]
