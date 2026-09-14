@@ -9,7 +9,7 @@
     "dev": "node dev.cjs",
     "build": "node build.cjs",
     "start": "node dev.cjs",
-    "test": "node test.cjs && node bank-test.cjs && node security-test.cjs"
+    "test": "node test.cjs && node bank-test.cjs && node sheets-sync-test.cjs && node manual-results-test.cjs && node presentation-test.cjs && node audio-test.cjs && node security-test.cjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.116.0"
