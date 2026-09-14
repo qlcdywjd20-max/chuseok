@@ -1,6 +1,6 @@
 'use strict';
 // Team indices are stable: existing database scores keep belonging to the same team.
-const TEAMS=[{name:'구청장팀',count:16,color:'#4d9fde',ink:'#134c79'},{name:'관장님팀',count:16,color:'#edb444',ink:'#74430f'},{name:'지회장팀',count:18,color:'#55a678',ink:'#20593b'}], TEAM_ORDER=[1,0,2];
+const TEAMS=[{name:'구청장님팀',count:16,color:'#4d9fde',ink:'#134c79'},{name:'관장님팀',count:16,color:'#edb444',ink:'#74430f'},{name:'지회장님팀',count:18,color:'#55a678',ink:'#20593b'}], TEAM_ORDER=[1,0,2];
 const CATS={smart:['스마트퀴즈','#f0d78f','📺',10],chuseok:['추석퀴즈','#a9cbee','🌕',10],town:['우리동네퀴즈','#a9cbee','🏘️',10],memory:['추억퀴즈','#f0d78f','📻',10],health:['건강상식','#f0d78f','🌿',10],song:['노래퀴즈','#9edfee','♪',15],gesture:['몸으로 말해요','#a8cdb3','🙌',15],mission:['팀미션','#a8d5b3','👏',15],chance:['찬스','#efd17a','✦',20],special:['찬스','#efd17a','✦',20],golden:['보너스','#e6aaa0','🎁',50],bonus:['보너스','#e6aaa0','🎁',50],cheer:['응원미션','#cbb2e8','👏',20]};
 const TYPES={'스마트경로당퀴즈':'smart','추석퀴즈':'chuseok','우리동네퀴즈':'town','추억퀴즈':'memory','건강상식':'health','건강퀴즈':'health','노래':'song','노래퀴즈':'song','노래한소절':'song','몸으로말해요':'gesture','몸짓':'gesture','미션':'mission','팀미션':'mission','찬스':'chance','복주머니찬스':'chance','특별찬스':'special','골든미션':'golden','보너스':'bonus','응원전':'cheer','응원미션':'cheer'};
 const KEYS={api:'onmaeul.api.v3',bank:'onmaeul.bank.v3'};
