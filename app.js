@@ -2,7 +2,8 @@
 // Team indices are stable: existing database scores keep belonging to the same team.
 const TEAMS=[{name:'구청장님팀',count:16,color:'#4d9fde',ink:'#134c79'},{name:'관장님팀',count:16,color:'#edb444',ink:'#74430f'},{name:'지회장님팀',count:18,color:'#55a678',ink:'#20593b'}], TEAM_ORDER=[1,0,2];
 const CATS={smart:['스마트퀴즈','#f0d78f','📺',10],chuseok:['추석퀴즈','#a9cbee','🌕',10],town:['우리동네퀴즈','#a9cbee','🏘️',10],memory:['추억퀴즈','#f0d78f','📻',10],health:['건강상식','#f0d78f','🌿',10],song:['노래퀴즈','#9edfee','♪',15],gesture:['몸으로 말해요','#a8cdb3','🙌',15],mission:['팀미션','#a8d5b3','👏',15],chance:['찬스','#efd17a','✦',20],special:['찬스','#efd17a','✦',20],golden:['보너스','#e6aaa0','🎁',50],bonus:['보너스','#e6aaa0','🎁',50],cheer:['응원미션','#cbb2e8','👏',20]};
-const TYPES={'스마트경로당퀴즈':'smart','추석퀴즈':'chuseok','우리동네퀴즈':'town','추억퀴즈':'memory','건강상식':'health','건강퀴즈':'health','노래':'song','노래퀴즈':'song','노래한소절':'song','몸으로말해요':'gesture','몸짓':'gesture','미션':'mission','팀미션':'mission','찬스':'chance','복주머니찬스':'chance','특별찬스':'special','골든미션':'golden','보너스':'bonus','응원전':'cheer','응원미션':'cheer'};
+CATS.shot=['쏜다!','#efb684','🎤',30];
+const TYPES={'스마트경로당퀴즈':'smart','추석퀴즈':'chuseok','우리동네퀴즈':'town','추억퀴즈':'memory','건강상식':'health','건강퀴즈':'health','쏜다!':'shot','쏜다':'shot','단체미션':'mission','일반퀴즈':'chuseok','노래':'song','노래퀴즈':'song','노래한소절':'song','몸으로말해요':'gesture','몸짓':'gesture','미션':'mission','팀미션':'mission','찬스':'chance','복주머니찬스':'chance','특별찬스':'special','골든미션':'golden','보너스':'bonus','응원전':'cheer','응원미션':'cheer'};
 const KEYS={api:'onmaeul.api.v3',bank:'onmaeul.bank.v3'};
 const clone=o=>JSON.parse(JSON.stringify(o)),esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])), $=id=>document.getElementById(id);
 const fresh=()=>({version:3,diceVersion:1,communityVersion:1,successes:[0,0,0],paused:false,pausedAt:null,flow:null,dieInput:null,openingIndex:0,finaleIndex:0,players:TEAMS.map(()=>({path:['S']})),scores:[0,0,0],selected:1,screen:'start',at:Date.now(),phase:'ready',busy:false,passed:[],notice:'',card:null,timer:null,scored:false,outcome:null,extra:false,sound:true,bank:clone(DEFAULT_BANK),bankAt:null,dice:null,completed:0,totalTurns:29,turnAt:0,scoreFx:null,chanceApplied:false,roundOpen:false});
@@ -13,8 +14,8 @@ for(let r=5;r>=0;r--)coords[cellId++]=[1475,50+r*100];
 for(let c=8;c>=0;c--)coords[cellId++]=[125+c*150,50];
 for(let r=1;r<=6;r++)coords[cellId++]=[125,50+r*100];
 for(let c=1;c<=8;c++)coords[cellId++]=[125+c*150,650];
-const position=p=>p.path.at(-1),isQuiz=c=>!!(c?.isQuiz||c?.choices?.length),category=c=>CATS[c?.type]||CATS.mission;
-const pointsFor=c=>category(c)[3]; // 행사 통일 배점: 시트의 과거 배점보다 유형 규칙을 우선합니다.
+const position=p=>p.path.at(-1),isQuiz=c=>!!(c?.quizKind||c?.isQuiz||c?.choices?.length||c?.question&&c?.answer),category=c=>CATS[c?.type]||CATS.mission;
+const pointsFor=c=>Number.isFinite(c?.points)?c.points:category(c)[3]; // 시트의 점수/배점이 최우선입니다.
 function canonical(id){if(id==='S'||id===0||id==='0')return ['S'];const n=Number(id);if(!Number.isInteger(n)||n<1||n>29)throw Error('위치는 출발 또는 1~29번입니다.');return ['S',...Array.from({length:n},(_,i)=>i+1)];}
 function nextStep(p){const at=position(p);return at==='S'?1:at===29?'S':Number(at)+1;}
 // Read legacy state without resetting scores or replacing the saved question bank.
@@ -75,7 +76,8 @@ function dispatch(a,v){if(!hasControl())return;
  if(a==='replayQuestion'){if(!S.card)return;pushHistory();S.flow=null;S.timer=null;if(isQuiz(S.card)){setScreen('question');startTimer(S.card.duration||20);}else{setScreen('mission');}publish();return;}
  if(a==='replayAnswer'){if(!S.card||!isQuiz(S.card))return;pushHistory();S.flow=null;S.timer=null;setScreen('answer');publish();return;}
  if(a==='scoreDirect'||a==='successDirect'){const i=Number(v),id=(a==='scoreDirect'?'directScore':'directSuccess')+i,n=Number($(id).value);if(!Number.isInteger(n)||Math.abs(n)>9999||a==='successDirect'&&n<0)return;pushHistory();if(a==='scoreDirect')changeScore(i,n-S.scores[i]);else S.successes[i]=n;publish();return;}
- if(S.busy&&!['sound','team','position','reset','opening','finale','scoreDelta','score'].includes(a))return;if(a==='roll'){roll(Number(v));return;}if(a==='random')return; // 실물 주사위만 사용if(a==='forward'||a==='back'){roll(a==='forward'?1:-1,true);return;}if(a.startsWith('timer-')){timerAction(a.slice(6));return;}
+ if(S.busy&&!['sound','team','position','reset','opening','finale','scoreDelta','score'].includes(a))return;if(a==='roll'){roll(Number(v));return;}if(a==='random')return; // 실물 주사위만 사용
+ if(a==='forward'||a==='back'){roll(a==='forward'?1:-1,true);return;}if(a.startsWith('timer-')){timerAction(a.slice(6));return;}
  switch(a){
  case 'start':pushHistory();S.flow=null;S.timer=null;S.card=null;S.dice=null;S.busy=false;S.openingIndex=0;setScreen('opening');flowTo('opening',1500);break;
  case 'board':S.flow=null;S.busy=false;S.timer=null;S.card=null;S.phase='ready';setScreen('board');break;
@@ -101,7 +103,31 @@ function dispatch(a,v){if(!hasControl())return;
  default:return;
  }publish();
 }
-function validateBank(rows){if(!Array.isArray(rows)||!rows.length)throw Error('문제 행이 없습니다.');const seen=new Set;return rows.map((r,i)=>{const k=Object.hasOwn(r,'칸번호'),get=(ko,en)=>k?r[ko]:r[en],id=Number(get('칸번호','id'));if(!Number.isInteger(id)||id<1||id>29||seen.has(id))throw Error((i+1)+'행: 칸번호는 중복 없이 1~29입니다.');seen.add(id);const t=String(get('유형','type')||'').replace(/\s/g,''),type=TYPES[t]||t;if(!CATS[type])throw Error(id+'번: 유형을 확인하세요.');const e=get('사용여부','enabled'),enabled=e===undefined||e===''||e===true||String(e).toUpperCase()==='TRUE';const choices=(k?[1,2,3,4].map(n=>r['보기'+n]||''):r.choices||[]).map(String).filter(x=>x.trim());let answer=String(get('정답','answer')??'');if(choices.length&&enabled){if(choices.length<2||choices.length>4)throw Error(id+'번: 보기는 2~4개입니다.');if(/^[1-4]$/.test(answer))answer=choices[+answer-1];if(!choices.includes(answer))throw Error(id+'번: 정답을 확인하세요.');}const duration=Number(get('제한시간','duration')||20),points=Number(get('배점','points')===''||get('배점','points')==null?CATS[type][3]:get('배점','points'));if(!Number.isFinite(duration)||duration<5||duration>600||!Number.isInteger(points)||points<0||points>999)throw Error(id+'번: 제한시간 5~600초, 배점 0~999점을 입력하세요.');const question=String(get('문제','question')||''),prompt=String(get('미션내용','prompt')||'');if(enabled&&!(choices.length?question:prompt).trim())throw Error(id+'번: 문제 또는 미션 내용을 입력하세요.');return {id,type,enabled,choices,answer,duration,points:CATS[type][3],question,prompt,title:String(get('제목','title')||CATS[type][0])};});}
+function validateBank(rows){
+ if(!Array.isArray(rows)||!rows.length)throw Error('문제 행이 없습니다.');const seen=new Set;
+ return rows.map((r,index)=>{
+  const get=(...keys)=>{for(const k of keys)if(Object.hasOwn(r,k))return r[k];};
+  const id=Number(get('칸번호','번호','id'));if(!Number.isInteger(id)||id<1||id>29||seen.has(id))throw Error((index+1)+'행: 칸번호는 중복 없이 1~29입니다.');seen.add(id);
+  const rawType=String(get('유형','문제유형','type')||'').replace(/\s/g,''),type=TYPES[rawType]||rawType;if(!CATS[type])throw Error(id+'번: 유형을 확인하세요. ('+rawType+')');
+  const active=get('사용여부','활성화여부','enabled'),enabled=active===undefined||active===''||active===true||String(active).trim().toUpperCase()==='TRUE';
+  const question=String(get('문제','question')||'').trim(),prompt=String(get('미션내용','prompt')||'').trim();
+  let choices=(get('choices')||[1,2,3,4].map(n=>get('보기'+n)||'')).map(v=>String(v).trim());
+  // 주관식 노래 문제에서 보기1에 안내 문구만 적힌 기존 시트도 허용합니다.
+  if(type==='song'&&choices.filter(Boolean).length<2)choices=[];
+  let answer=String(get('정답','answer')??'').trim();
+  if(choices.some(Boolean)){
+   if(/^[①②③④]$/.test(answer))answer=String('①②③④'.indexOf(answer)+1);
+   if(/^[1-4](번)?$/.test(answer)){answer=choices[parseInt(answer)-1]||'';}
+   choices=choices.filter(Boolean);
+   if(enabled&&(choices.length<2||choices.length>4||!choices.includes(answer)))throw Error(id+'번: 보기 2~4개와 올바른 정답을 확인하세요.');
+  }else choices=[];
+  const quizKind=!!(question&&(choices.length||answer));
+  if(enabled&&(!question&&!prompt||choices.length&&!question||question&&!prompt&&!quizKind))throw Error(id+'번: 퀴즈는 문제와 정답, 미션은 미션내용을 입력하세요.');
+  const duration=Number(get('제한시간','duration')||20),p=get('점수','배점','points'),points=p==null||String(p).trim()===''?CATS[type][3]:Number(p);
+  if(!Number.isFinite(duration)||duration<5||duration>600||!Number.isInteger(points)||points<0||points>999)throw Error(id+'번: 제한시간 5~600초, 점수 0~999를 입력하세요.');
+  return {id,type,enabled,question,prompt,choices,answer,quizKind,duration,points,title:String(get('제목','title')||CATS[type][0])};
+ });
+}
 const DEFAULT_BANK_URL='https://docs.google.com/spreadsheets/d/1m2UBLTw6tiayReLXHKPlhr7bGpgReh41PqvKxIQRmt8/edit#gid=0';
 let bankMessage='';
 function bankRequestUrl(value){
@@ -117,13 +143,69 @@ function parseBankCsv(text){
  for(const h of ['칸번호','유형','제목','문제','보기1','보기2','보기3','보기4','정답','미션내용','제한시간','사용여부'])if(!headers.includes(h))throw Error('필수 열이 없습니다: '+h);
  return table.filter(r=>r[headers.indexOf('칸번호')]?.trim()).map(r=>Object.fromEntries(headers.map((h,i)=>[h,r[i]??''])));
 }
-async function refreshBank(){
- if(fetching||S.busy||!hasControl())return;if(!['board','start'].includes(S.screen)){bankMessage='보드 화면에서 새로고침해 주세요.';renderControl();return;}
- const source=$('apiUrl').value.trim();let request;try{request=bankRequestUrl(source);}catch(e){bankMessage=e.message;renderControl();return;}
- fetching=true;bankMessage='문제은행을 불러오는 중…';renderControl();const abort=new AbortController(),timeout=setTimeout(()=>abort.abort(),30000);
- try{const url=new URL(request.url);url.searchParams.set('t',Date.now());const res=await fetch(url,{signal:abort.signal,credentials:'omit',cache:'no-store'});if(!res.ok)throw Error('시트 열람 권한 또는 웹앱 배포 권한을 확인하세요. (응답 '+res.status+')');const text=await res.text();if(/^\s*</.test(text))throw Error('문제 대신 로그인 화면을 받았습니다. 시트 공유 설정을 확인하세요.');const payload=request.csv?parseBankCsv(text):JSON.parse(text);if(payload.error)throw Error(payload.error);const rows=validateBank(payload.rows||payload);if(!hasControl())throw Error('조작권이 변경되었습니다. 다시 이어받으세요.');pushHistory();const map=new Map(rows.map(c=>[c.id,c]));S.bank=DEFAULT_BANK.map(c=>map.get(c.id)||{...clone(c),enabled:false});S.bankAt=Date.now();S.bankSource=source;safeWrite(KEYS.api,source);safeWrite(KEYS.bank,{rows:S.bank,at:S.bankAt});await publish();bankMessage=hasControl()?rows.filter(c=>c.enabled).length+'개 문제·미션 반영 완료':'서버 저장을 확인하지 못했습니다. 조작권을 다시 이어받으세요.';
- }catch(e){bankMessage='기존 문제로 계속 진행합니다. '+e.message;}finally{clearTimeout(timeout);fetching=false;renderControl();}
+// 기존 CSV / Apps Script 가져오기를 공통 사용합니다. 칸번호로만 연결하며 행 순서는 무관합니다.
+let bankFlight=null,bankTransition=null,bankCheckedAt=0;
+async function refreshBank(options={}){
+ if(!hasControl())return false;
+ if(bankFlight)return bankFlight;
+ const manual=!options.auto;
+ const source=(manual?$('apiUrl')?.value?.trim():null)||S.bankSource||DEFAULT_BANK_URL;
+ const originalState=S;
+ fetching=true;if(manual){bankMessage='최신 문제은행을 확인하는 중…';renderControl();}
+ bankFlight=(async()=>{
+  const abort=new AbortController(),timeout=setTimeout(()=>abort.abort(),7000);
+  try{
+   const request=bankRequestUrl(source),url=new URL(request.url);url.searchParams.set('_fresh',Date.now());
+   const res=await fetch(url,{signal:abort.signal,credentials:'omit',cache:'no-store'});
+   if(!res.ok)throw Error('시트 열람 실패 (응답 '+res.status+')');
+   const text=await res.text();if(/^\s*</.test(text))throw Error('로그인 화면을 받았습니다. 시트 공유 권한을 확인하세요.');
+   const payload=request.csv?parseBankCsv(text):JSON.parse(text);if(payload.error)throw Error(payload.error);
+   const rows=validateBank(payload.rows||payload);
+   if(!hasControl()||S!==originalState)return false;
+   const map=new Map(rows.map(c=>[c.id,c]));
+   // 누락된 번호는 쉼터입니다. 고정된 예제 문제를 대신 섞지 않습니다.
+   const bank=Array.from({length:29},(_,i)=>map.get(i+1)||{id:i+1,type:S.bank.find(c=>c.id===i+1)?.type||'mission',enabled:false,choices:[],question:'',prompt:'',answer:'',title:'쉼터',duration:20,points:0});
+   const changed=JSON.stringify(bank)!==JSON.stringify(S.bank)||S.bankSource!==source;
+   S.bank=bank;S.bankSource=source;bankCheckedAt=Date.now();
+   if(changed){
+    S.bankAt=bankCheckedAt;
+    // 진행 중 문제도 같은 칸 번호의 최신 문구/정답/유형으로 갱신합니다.
+    // 판정 완료 문제는 지급된 점수와 결과를 보존합니다. 타이머는 다시 시작하지 않습니다.
+    const c=bank.find(c=>c.id===S.card?.id);
+    if(c?.enabled&&!S.scored&&['intro','question','mission','chance','camera','answer'].includes(S.screen)){
+     const wasQuiz=isQuiz(S.card);S.card=clone(c);
+     if(S.screen!=='intro'&&wasQuiz!==isQuiz(c)){
+      S.flow=null;S.screen=isQuiz(c)?(S.timer?.ended?'answer':'question'):'mission';
+     }
+    }
+    safeWrite(KEYS.api,source);safeWrite(KEYS.bank,{rows:bank,at:S.bankAt});await publish();
+   }
+   bankMessage='시트 자동 연결 · '+rows.filter(c=>c.enabled).length+'개 · 마지막 확인 '+new Date(bankCheckedAt).toLocaleTimeString('ko-KR')+' · 5초마다 확인';
+   return true;
+  }catch(e){bankMessage='시트 연결 확인 필요 · 마지막 문제로 계속 진행합니다. '+(e.name==='AbortError'?'응답 시간이 초과되었습니다.':e.message);return false;}
+  finally{clearTimeout(timeout);fetching=false;renderControl();}
+ })();
+ try{return await bankFlight;}finally{bankFlight=null;}
 }
+// 연결 중에도 일시정지·팀 변경·위치 수정이 가능합니다. 변경 전 요청은 진행을 되돌리지 않습니다.
+async function withLatestBank(action){
+ if(bankTransition)return;
+ const token={},state=S,screen=S.screen,flow=S.flow,team=S.selected,paused=S.paused;
+ bankTransition=token;
+ try{await refreshBank({auto:true});if(hasControl()&&S===state&&S.screen===screen&&S.flow===flow&&S.selected===team&&S.paused===paused)action();}
+ finally{if(bankTransition===token)bankTransition=null;}
+}
+const dispatchBeforeSheets=dispatch;
+dispatch=function(a,v){
+ if(['start','question','nextQuestion','open','replayQuestion'].includes(a)&&hasControl())return withLatestBank(()=>dispatchBeforeSheets(a,v));
+ return dispatchBeforeSheets(a,v);
+};
+const flowBeforeSheets=advanceFlow;
+advanceFlow=function(){
+ if(S.flow?.kind==='arrival')return withLatestBank(()=>flowBeforeSheets());
+ return flowBeforeSheets();
+};
+if(!globalThis.__TEST__)setInterval(()=>{if(hasControl())void refreshBank({auto:true});},5000);
 function confetti(){return '<div class="confetti">'+Array.from({length:36},(_,i)=>`<i style="--x:${i*37%100}%;--delay:${i%8*.11}s;--c:${['#e7b448','#619dc4','#6eaf80','#d692a2'][i%4]}"></i>`).join('')+'</div>';}
 function die(n,cls=''){const dots={1:[5],2:[1,9],3:[1,5,9],4:[1,3,7,9],5:[1,3,5,7,9],6:[1,3,4,6,7,9]}[n]||[5];return `<div class="die ${cls}" aria-label="주사위 ${n}">${Array.from({length:9},(_,i)=>`<i class="${dots.includes(i+1)?'pip':''}"></i>`).join('')}</div>`;}
 const locationText=p=>position(p)==='S'?'출발 칸':`${String(position(p)).padStart(2,'0')}번 칸`;
@@ -159,17 +241,17 @@ let controlKey='';
 function renderControl(){if(mode==='display')return;const key=JSON.stringify([S.screen,S.selected,S.busy,S.phase,S.card,S.scored,S.chanceApplied,S.scores,S.sound,S.timer?.running,S.timer?.ended,history.length,authority,S.bankAt,apiMessage,bankMessage,fetching,S.paused,S.flow?.kind,S.dieInput,S.successes,S.completed]);if(key===controlKey&&$('adminActions'))return;controlKey=key;
  const keep={};$('control').querySelectorAll('input,select,details').forEach(e=>{if(e.id)keep[e.id]=e.tagName==='DETAILS'?e.open:e.value;});const scroll=$('control').scrollTop;
  const b=(label,a,v='',disabled=false,cls='')=>button(label,a,v,disabled||(S.busy&&!['position','scoreDelta','score','sound'].includes(a)),cls),board=S.screen==='board';
- $('control').innerHTML=`<div id="adminActions"><div class="admin-title"><b>행사 조작실</b><a href="/game" target="_blank">관람 화면 ↗</a></div><div class="row">${button('조작권 이어받기','takeover')}${button('로그아웃','logout')}</div><p id="cloudStatus">${esc(apiMessage||'서버 연결 완료')}</p><div class="row">${TEAM_ORDER.map(i=>button(TEAMS[i].name,'team',i,false,S.selected===i?'selected':'')).join('')}</div><h2>${TEAMS[S.selected].name} · ${S.completed}/${S.totalTurns}회 완료</h2><section class="progress-controls"><h2>진행 컨트롤</h2><div class="row">${button('⏸ 일시정지','pauseAll','',S.paused)}${button('▶ 계속 진행','resumeAll','',!S.paused)}${button('이전 단계','previous','',!history.length)}${button('다음 단계','nextStage')}${button('현재 문제 다시보기','replayQuestion','',!S.card)}${button('정답 다시보기','replayAnswer','',!isQuiz(S.card))}${button('타이머 다시 시작','timer-restart','',!S.timer)}</div><p>${S.paused?'진행 일시정지 · 단계 버튼으로 한 단계씩 진행 가능':'자동 진행 중 · 판정 후 다음 팀으로 전환됩니다.'}</p></section>${S.screen==='start'?b('🎲 게임 시작','start','',false,'primary'):''}<h2>실물 주사위 결과</h2><div class="row dice-input">${[1,2,3,4,5,6].map(n=>button(n,'dieSelect',n,S.busy||!board||S.phase!=='ready',S.dieInput===n?'selected':'')).join('')}</div>${button('🎲 주사위 공개'+(S.dieInput?' · '+S.dieInput+'칸':''),'revealDice','',!S.dieInput||S.paused||S.busy||!board||S.phase!=='ready','primary')}<p>실제 주사위 숫자를 선택한 뒤 공개하세요.</p>
+ $('control').innerHTML=`<div id="adminActions"><div class="admin-title"><b>행사 조작실</b><a href="/game" target="_blank">관람 화면 ↗</a></div><div class="row">${button('조작권 이어받기','takeover')}${button('로그아웃','logout')}</div><p id="cloudStatus">${esc(apiMessage||'서버 연결 완료')}</p><p role="status">${esc(bankMessage||'조작권을 이어받으면 구글시트를 자동으로 확인합니다.')}</p><div class="row">${TEAM_ORDER.map(i=>button(TEAMS[i].name,'team',i,false,S.selected===i?'selected':'')).join('')}</div><h2>${TEAMS[S.selected].name} · ${S.completed}/${S.totalTurns}회 완료</h2><section class="progress-controls"><h2>진행 컨트롤</h2><div class="row">${button('⏸ 일시정지','pauseAll','',S.paused)}${button('▶ 계속 진행','resumeAll','',!S.paused)}${button('이전 단계','previous','',!history.length)}${button('다음 단계','nextStage')}${button('현재 문제 다시보기','replayQuestion','',!S.card)}${button('정답 다시보기','replayAnswer','',!isQuiz(S.card))}${button('타이머 다시 시작','timer-restart','',!S.timer)}</div><p>${S.paused?'진행 일시정지 · 단계 버튼으로 한 단계씩 진행 가능':'자동 진행 중 · 판정 후 다음 팀으로 전환됩니다.'}</p></section>${S.screen==='start'?b('🎲 게임 시작','start','',false,'primary'):''}<h2>실물 주사위 결과</h2><div class="row dice-input">${[1,2,3,4,5,6].map(n=>button(n,'dieSelect',n,S.busy||!board||S.phase!=='ready',S.dieInput===n?'selected':'')).join('')}</div>${button('🎲 주사위 공개'+(S.dieInput?' · '+S.dieInput+'칸':''),'revealDice','',!S.dieInput||S.paused||S.busy||!board||S.phase!=='ready','primary')}<p>실제 주사위 숫자를 선택한 뒤 공개하세요.</p>
  ${S.card?`<h2>${S.card.id}번 ${esc(S.card.title)} · ${pointsFor(S.card)}점</h2><div class="row">${b('문제 열기','open','',S.screen!=='intro')}${b('정답 공개','answer','',!['question','camera'].includes(S.screen))}</div>`:''}
  ${S.timer?`<h2>남은 시간 <span data-timer></span>초</h2><div class="row">${b('시작','timer-start','',S.timer.running||S.timer.ended)}${b('정지','timer-pause','',!S.timer.running)}${b('초기화·재시작','timer-restart')}${b('+10초','timer-add')}${b('시간 종료','timer-end','',S.timer.ended)}</div>`:''}
  ${S.screen==='chance'?b('찬스 카드 뒤집기','chance','',S.chanceApplied,'primary'):''}
  ${['answer','mission','chance'].includes(S.screen)?`<div class="row">${b('정답·성공 +'+pointsFor(S.card)+'점','good','',S.scored||S.screen==='chance'&&!S.chanceApplied,'primary')}${b('오답 · 0점','soft','',S.scored)}</div>`:''}
  ${S.card?`<div class="row">${b('다음 단계','nextStage')}${b('문제 건너뛰기','complete')}</div>`:''}
  <h2>점수 추가 / 감점</h2>${TEAMS.map((t,i)=>`<div class="score-control"><b>${t.name} ${S.scores[i]}점</b><div class="row">${[10,15,20,30,-10].map(n=>b((n>0?'+':'')+n,'scoreDelta',i+':'+n)).join('')}</div></div>`).join('')}
- <details id="directDetails"><summary>점수 직접 수정 · 성공 횟수 수정</summary>${TEAM_ORDER.map(i=>`<label>${TEAMS[i].name} 획득 점수<input id="directScore${i}" type="number" value="${S.scores[i]}"></label>${button('점수 적용','scoreDirect',i)}<label>성공 횟수<input id="directSuccess${i}" type="number" min="0" value="${S.successes[i]}"></label>${button('성공 횟수 적용','successDirect',i)}`).join('')}</details><details id="questionsDetails"><summary>문제 선택 · 통일 배점</summary><select id="questionChoice">${S.bank.filter(c=>c.enabled).map(c=>`<option value="${c.id}">${c.id}번 ${esc(c.title)} · ${pointsFor(c)}점</option>`).join('')}</select><div class="row">${b('선택 문제 띄우기','question')}${b('다음 문제','nextQuestion')}</div><p>통일 배점: 추석·동네 10 / 노래·팀미션 15 / 찬스·응원 20점. 기존 기타 유형은 유지됩니다.</p></details>
+ <details id="directDetails"><summary>점수 직접 수정 · 성공 횟수 수정</summary>${TEAM_ORDER.map(i=>`<label>${TEAMS[i].name} 획득 점수<input id="directScore${i}" type="number" value="${S.scores[i]}"></label>${button('점수 적용','scoreDirect',i)}<label>성공 횟수<input id="directSuccess${i}" type="number" min="0" value="${S.successes[i]}"></label>${button('성공 횟수 적용','successDirect',i)}`).join('')}</details><details id="questionsDetails"><summary>문제 선택 · 시트 배점</summary><select id="questionChoice">${S.bank.filter(c=>c.enabled).map(c=>`<option value="${c.id}">${c.id}번 ${esc(c.title)} · ${pointsFor(c)}점</option>`).join('')}</select><div class="row">${b('선택 문제 띄우기','question')}${b('다음 문제','nextQuestion')}</div><p>점수는 구글시트의 점수 열을 따릅니다.</p></details>
  <details id="adjustDetails"><summary>말 위치 · 행사 설정</summary><div class="row">${b('한 칸 앞으로','forward','',!board)}${b('한 칸 뒤로','back','',!board||S.players[S.selected].path.length<2)}${b('실행취소','undo','',!history.length)}</div><select id="positionInput"><option value="S">출발</option>${S.bank.map(c=>`<option value="${c.id}">${c.id}번 칸</option>`).join('')}</select>${b('말 위치 수정','position')}
  <label>총 진행 횟수 (완료 시 최종 결과)<input id="turnsInput" type="number" min="1" max="999" value="${S.totalTurns}"></label>${b('횟수 적용','turns')}<div class="row">${b(S.sound?'효과음 ON':'효과음 OFF','sound')}${b('START 화면','opening')}${b('보드 복귀','board')}${b('최종 결과','finale')}${b('게임 초기화','reset','',false,'danger')}</div></details>
- <details id="bankDetails"><summary>Google Sheets 문제은행</summary><label>구글시트 또는 Apps Script 주소<input id="apiUrl" value="${esc(S.bankSource||safeRead(KEYS.api)||DEFAULT_BANK_URL||'')}" placeholder="https://script.google.com/macros/s/…/exec"></label>${b('문제 새로고침','refresh','',fetching||!board&&S.screen!=='start')}<p>${esc(bankMessage)}</p><p>기존 시트는 그대로 사용합니다. 배점은 행사 유형별 통일 규칙이 우선 적용됩니다.</p></details></div>`;
+ <details id="bankDetails"><summary>Google Sheets 문제은행</summary><label>구글시트 또는 Apps Script 주소<input id="apiUrl" value="${esc(S.bankSource||safeRead(KEYS.api)||DEFAULT_BANK_URL||'')}" placeholder="https://script.google.com/macros/s/…/exec"></label>${b('문제 새로고침','refresh','',fetching)}<p>${esc(bankMessage)}</p><p>이 창에서 조작권을 유지하면 5초마다 시트를 확인합니다. 문제·정답·유형·점수는 칸번호로 연결되며 송출 화면에도 반영됩니다.</p></details></div>`;
  Object.entries(keep).forEach(([id,v])=>{if($(id)){if($(id).tagName==='DETAILS')$(id).open=v;else $(id).value=v;}});$('control').scrollTop=scroll;
  $('control').querySelectorAll('button').forEach(b=>{if(!authority&&!['takeover','logout'].includes(b.dataset.action))b.disabled=true;});
 }
