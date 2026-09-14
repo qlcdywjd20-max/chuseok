@@ -1,0 +1,11 @@
+const fs=require('fs'),vm=require('vm'),assert=require('assert');let now=100000;
+const c={__TEST__:true,assert,console,Date:class extends Date{static now(){return now}},URL,URLSearchParams,confirm:()=>true,document:{getElementById:()=>({value:''})},DEFAULT_BANK:[{id:1,type:'chuseok',enabled:true,question:'시트 문제',answer:'정답',choices:['정답','다른 답'],points:20,duration:30}]};vm.createContext(c);vm.runInContext(fs.readFileSync(__dirname+'/app.js','utf8'),c);
+c.advance=()=>now+=60000;
+vm.runInContext(`hasControl=()=>true;render=()=>{};renderControl=()=>{};updateClock=()=>{};tone=()=>{};publish=()=>{};
+S=fresh();S.screen='board';S.players[1].path=['S',1];S.flow={kind:'arrival',due:Date.now()};advanceFlow();assert.equal(S.screen,'intro');assert.equal(S.flow,null);assert.equal(S.timer,null);advance();tick();assert.equal(S.screen,'intro');dispatch('open');assert.equal(S.screen,'question');assert(S.timer.running);assert.equal(S.timer.duration,30);
+S=normalizeState({...fresh(),screen:'intro',flow:{kind:'content',due:1},timer:{running:true}});assert.equal(S.flow,null);assert.equal(S.timer,null);
+S=fresh();S.scores=[99,200,100];S.successes=[8,0,9];S.screen='finale';S.finaleIndex=4;let html=showHTML();assert(html.includes('오늘의 MVP!'));assert(/mvp-winner[^]*?관장님팀[^]*?200/.test(html));assert(!html.includes('성공'));assert(!html.includes('미인정'));assert.equal((html.match(/🏆 MVP/g)||[]).length,1);
+S.scores=[200,200,10];html=showHTML();assert(html.includes('공동 MVP'));assert.equal((html.match(/🏆 MVP/g)||[]).length,2);
+`,c);
+const html=fs.readFileSync(__dirname+'/index.html','utf8');assert(!/id="success[012]"|8문제/.test(html));new vm.Script(html.replace('/*BANK*/','const DEFAULT_BANK=[];').replace('/*APP*/',fs.readFileSync(__dirname+'/app.js','utf8')).match(/<script>([\s\S]*?)<\/script>/)[1]);
+console.log('PASS: intro waits indefinitely, manual opening starts timer, pending legacy auto-reveal cleared, highest raw score wins regardless of successes, tied MVP, no success/8 labels, page compiles.');

@@ -3,7 +3,7 @@ const app=fs.readFileSync(__dirname+'/app.js','utf8');
 let requests=0,reply,fail=false,delayResolve,waiting=false;
 const ctx={__TEST__:true,URL,URLSearchParams,Date,console,AbortController,setTimeout,clearTimeout,confirm:()=>true,document:{getElementById:()=>({value:''})},localStorage:{getItem:()=>null,setItem:()=>{}},DEFAULT_BANK:Array.from({length:29},(_,i)=>({id:i+1,type:'chuseok',enabled:true})),fetch:async(url,options)=>{requests++;assert.equal(options.cache,'no-store');assert(new URL(url).searchParams.has('_fresh'));if(waiting)await new Promise(r=>delayResolve=r);if(fail)throw Error('offline');return {ok:true,text:async()=>reply};}};
 vm.createContext(ctx);vm.runInContext(app,ctx);
-vm.runInContext("hasControl=()=>true;render=()=>{};renderControl=()=>{};tone=()=>{};publish=async()=>{};S=fresh();S.screen='board';",ctx);
+vm.runInContext("hasControl=()=>true;render=()=>{};renderControl=()=>{};tone=()=>{};publish=async()=>{};S=fresh();S.screen='board';installBankSync(false);",ctx);
 function csv(rows){return [['칸번호','유형','제목','문제','보기1','보기2','보기3','보기4','정답','미션내용','제한시간','사용여부','점수'],...rows].map(r=>r.map(v=>'"'+String(v??'').replaceAll('"','""')+'"').join(',')).join('\r\n');}
 const rows=[[19,'쏜다!','쏜다','','','','','','','함께 노래',30,true,30],[4,'노래퀴즈','노래','제목은?','제목은?','','','','사랑의 배터리','',30,true,20],[1,'추석퀴즈','추석','수정 문제','떡국','팥빙수','붕어빵','송편',4,'',30,true,20]];
 (async()=>{
