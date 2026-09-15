@@ -3,6 +3,9 @@ function createFestivalAudio({document:doc, window:win, fallback=()=>{}}) {
   const make=(id,src,loop=false)=>{const a=doc.createElement('audio');a.id=id;a.src=src;a.loop=loop;a.preload='auto';a.hidden=true;doc.body.append(a);return a;};
   const bgm=make('festivalBgm','/audio/festival-game.wav',true);
   const success=make('festivalSuccess','/audio/correct-bell.wav');
+  const effects={success,applause:make('festivalApplause','/audio/applause.wav'),fanfare:make('festivalFanfare','/audio/fanfare.ogg')};
+  let activeEffect=null,effectToken=0;
+  function stopEffects(){effectToken++;for(const a of Object.values(effects)){a.pause();a.currentTime=0;}activeEffect=null;restore();}
   let state={},unlocked=false,ducked=false,playing=false,restoreTimer=null,muted=false,controls=null;
   const seen=new Set();let first=true,priming=Promise.resolve();
   const baseVolume=()=>Math.max(0,Math.min(1,Number.isFinite(Number(state.bgmVolume))?Number(state.bgmVolume):.12));
@@ -13,32 +16,32 @@ function createFestivalAudio({document:doc, window:win, fallback=()=>{}}) {
   function unlock(){
     // Both play calls must originate in this window's user gesture, before awaiting.
     muted=false;fallback('unlock');if(bgm.error)bgm.load();
-    if(!unlocked){success.volume=0;priming=success.play().then(()=>{success.pause();success.currentTime=0;success.volume=.7;}).catch(()=>{success.volume=.7;});}
+    if(!unlocked){priming=Promise.all(Object.values(effects).map(a=>{a.volume=0;return a.play().then(()=>{a.pause();a.currentTime=0;a.volume=.7;}).catch(()=>{a.volume=.7;});}));}
     unlocked=true;playing=false;sync();report();return priming;
   }
-  function playSuccess(){
+  function playSuccess(kind='success'){
     if(!unlocked||muted||state.sound===false)return;
-    restore();success.pause();success.currentTime=0;success.volume=.7;
-    ducked=true;gain();success.dataset.plays=String(Number(success.dataset.plays||0)+1);
-    success.play().then(()=>{restoreTimer=win.setTimeout(restore,5000);}).catch(()=>{restore();success.dataset.status='load-error';fallback('answer');});
+    stopEffects();const sound=effects[kind],token=effectToken;activeEffect=sound;sound.volume=.7;
+    ducked=true;gain();sound.dataset.plays=String(Number(sound.dataset.plays||0)+1);
+    sound.play().then(()=>{if(token!==effectToken)return;restoreTimer=win.setTimeout(()=>{if(activeEffect===sound){sound.pause();activeEffect=null;restore();}},Math.min(60000,(Number.isFinite(sound.duration)?sound.duration+1:45)*1000));}).catch(()=>{if(token!==effectToken)return;activeEffect=null;restore();sound.dataset.status='load-error';fallback('answer');});
   }
-  success.addEventListener('ended',restore);success.addEventListener('error',restore);
+  for(const sound of Object.values(effects))for(const event of ['ended','error'])sound.addEventListener(event,()=>{if(activeEffect===sound){activeEffect=null;restore();}});
   const gesture=()=>{if(!muted&&(!unlocked||bgm.dataset.status==='click-required'))unlock();};
   win.addEventListener('pointerdown',gesture,{capture:true});win.addEventListener('keydown',gesture,{capture:true});
-  function update(next){state=next;sync();if(state.sound===false){success.pause();restore();}
+  function update(next){state=next;sync();if(state.sound===false)stopEffects();
     const cue=state.audioCue;
     if(first){first=false;if(cue)seen.add(cue.id);return;}
     if(!cue||seen.has(cue.id))return;
     seen.add(cue.id);if(seen.size>256)seen.delete(seen.values().next().value);
-    if(!unlocked||muted||state.sound===false||Date.now()-cue.at>12000||Date.now()-cue.at< -1000||(state.paused&&!['test','successTest'].includes(cue.kind)))return;
-    if(['success','successTest'].includes(cue.kind))playSuccess();else fallback(cue.kind);
+    if(!unlocked||muted||state.sound===false||Date.now()-cue.at>12000||Date.now()-cue.at< -1000||(state.paused&&!['test','successTest','applause','fanfare','soundStop'].includes(cue.kind)))return;
+    if(cue.kind==='soundStop')stopEffects();else if(['applause','fanfare'].includes(cue.kind))playSuccess(cue.kind);else if(['success','successTest'].includes(cue.kind))playSuccess();else fallback(cue.kind);
   }
   function report(){
     if(!controls)return;
     const message=muted?'이 창 음소거':bgm.error?'음원 로드 실패 · 소리 켜기로 재시도':!unlocked||bgm.dataset.status==='click-required'?'이 창에서 소리 켜기를 눌러주세요':state.bgmOn===false?'관리자 BGM OFF':state.paused?'행사 일시정지':baseVolume()===0?'BGM 음량 0%':!bgm.paused?'BGM 재생 중 · '+Math.round(baseVolume()*100)+'%':'BGM 연결 중';
     controls.querySelector('[role=status]').textContent=message;
   }
-  function setMuted(value){muted=value;if(muted){success.pause();restore();}sync();report();}
+  function setMuted(value){muted=value;if(muted)stopEffects();sync();report();}
   function mount(){
     if(controls)return;
     controls=doc.createElement('details');controls.id='broadcastAudioControls';controls.open=true;

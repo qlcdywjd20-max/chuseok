@@ -2,7 +2,7 @@
 // No recordings, samples, or existing song melodies are used.
 const fs=require('fs');
 function compose(file){
- const rate=22050,bpm=120,beat=60/bpm,bars=16,length=bars*4*beat,n=Math.round(length*rate),mix=new Float64Array(n);
+ const rate=22050,bpm=144,beat=60/bpm,bars=16,length=bars*4*beat,n=Math.round(length*rate),mix=new Float64Array(n);
  let seed=1789;const noise=()=>{seed=(Math.imul(seed,1664525)+1013904223)>>>0;return seed/2147483648-1;};
  const freq=m=>440*2**((m-69)/12);
  function tone(at,dur,midi,amp,kind='pluck'){
@@ -15,12 +15,12 @@ function compose(file){
   }
  }
  function drum(at,kind){const dur=kind==='kick'?.22:.09,start=Math.round(at*rate);
-  for(let i=0;i<dur*rate;i++){const t=i/rate;const v=kind==='janggu'?(Math.sin(2*Math.PI*190*t)*.13+noise()*.06)*Math.exp(-t*35):kind==='kick'?Math.sin(2*Math.PI*(52*t+45*.025*(1-Math.exp(-t/.025))))*Math.exp(-t*24)*.27:noise()*Math.exp(-t*(kind==='hat'?75:40))*(kind==='hat'?.035:.075);mix[(start+i)%n]+=v;}
+  for(let i=0;i<dur*rate;i++){const t=i/rate;const v=kind==='janggu'?(Math.sin(2*Math.PI*190*t)*.23+noise()*.08)*Math.exp(-t*35):kind==='kick'?Math.sin(2*Math.PI*(52*t+45*.025*(1-Math.exp(-t/.025))))*Math.exp(-t*24)*.27:noise()*Math.exp(-t*(kind==='hat'?75:40))*(kind==='hat'?.035:.075);mix[(start+i)%n]+=v;}
  }
- const chords=[[60,64,67],[57,60,64],[53,57,60],[55,59,62]];
- const melodies=[[72,76,79,76,81,79,76,74],[76,79,81,79,76,74,72,76],[77,81,84,81,79,77,76,74],[79,76,74,71,74,76,79,72]];
+ const chords=[[60,64,67],[57,60,64],[62,67,69],[55,62,67]];
+ const melodies=[[72,76,79,76,81,79,76,74],[76,79,81,79,76,74,72,76],[76,81,84,81,79,76,74,72],[79,76,74,72,74,76,79,72]];
  for(let bar=0;bar<bars;bar++){const c=chords[bar%4],mel=melodies[bar%4],at=bar*4*beat;
-  for(let b=0;b<4;b++){drum(at+b*beat,'kick');drum(at+(b+.5)*beat,'hat');if(b%2){drum(at+b*beat,'snare');drum(at+b*beat,'janggu');}drum(at+(b+.75)*beat,'janggu');tone(at+b*beat,beat*.7,c[b%2?2:0]-24,.23,'bass');for(const m of c)tone(at+(b+.5)*beat,beat*.38,m,.035,'chord');}
+  for(let b=0;b<4;b++){drum(at+b*beat,'kick');drum(at+(b+.5)*beat,'hat');if(b%2){drum(at+b*beat,'snare');drum(at+b*beat,'janggu');}drum(at+(b+.75)*beat,'janggu');if(b===0||b===2)drum(at+(b+.25)*beat,'janggu');tone(at+b*beat,beat*.7,c[b%2?2:0]-24,.23,'bass');for(const m of c)tone(at+(b+.5)*beat,beat*.38,m,.035,'chord');}
   if(bar%4===3)for(const step of [3.25,3.5,3.75])drum(at+step*beat,'janggu');
   for(let k=0;k<8;k++){if(bar%4===3&&k===7)continue;tone(at+k*beat/2,beat*.7,mel[k]+(bar>=8&&bar<12?12:0),.12);tone(at+k*beat/2+beat*.75,beat*.5,mel[k],.022);}
  }
