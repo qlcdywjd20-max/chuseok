@@ -1,7 +1,7 @@
 /* Local recordings only. Attribution and permitted uses: /audio/LICENSES.md. */
 function createFestivalAudio({document:doc, window:win, fallback=()=>{}}) {
   const make=(id,src,loop=false)=>{const a=doc.createElement('audio');a.id=id;a.src=src;a.loop=loop;a.preload='auto';a.hidden=true;doc.body.append(a);return a;};
-  const bgm=make('festivalBgm','/audio/how-are-you-gayageum.mp3',true);
+  const bgm=make('festivalBgm','/audio/festival-game.wav',true);
   const success=make('festivalSuccess','/audio/correct-bell.wav');
   let state={},unlocked=false,ducked=false,playing=false,restoreTimer=null,muted=false,controls=null;
   const seen=new Set();let first=true,priming=Promise.resolve();
