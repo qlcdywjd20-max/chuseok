@@ -26,3 +26,21 @@
 - 프로젝트 파일: `public/audio/correct-bell.wav` (원본 그대로, 281,900 bytes)
 
 공유마당 BGM의 출처 표기는 송출 화면 하단 및 이 파일에 포함되어 있습니다. 프로젝트를 다른 곳에 배포할 때도 해당 표기와 파일을 함께 유지하세요.
+
+
+## 현재 BGM — 한가위 대항전 리듬 (144 BPM)
+festival-music.cjs에서 직접 합성하는 프로젝트 오리지널 연주입니다. 기존 곡·녹음·외부 샘플을 사용하지 않습니다. 5음계 발현음과 북·장구를 연상시키는 합성 타악 리듬이며 실제 국악기 녹음은 아닙니다. 빌드 시 /audio/festival-game.wav 생성. 이전 가야금 파일은 예비 파일로 보존합니다.
+
+## 박수 — Applause in a large hall or church
+저작자 eXpl0it3r. CC0 1.0. 행사·상업적 이용·수정·재배포 가능.
+https://opengameart.org/content/applause-in-a-large-hall-or-church
+파일: public/audio/applause.wav
+
+## 팡파르 — Win Fanfare
+저작자 gchoc (Graciano Choc). CC0 1.0. 행사·상업적 이용·수정·재배포 가능.
+https://opengameart.org/node/161644
+파일: public/audio/fanfare.ogg
+라이선스: https://creativecommons.org/publicdomain/zero/1.0/
+확인일: 2026-09-15
+
+박수 파일은 원본의 0.5초 지점부터 8초를 발췌하고 시작·끝에 페이드를 적용했습니다(CC0 허용).
