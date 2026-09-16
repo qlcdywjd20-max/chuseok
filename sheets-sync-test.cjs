@@ -23,5 +23,15 @@ waiting=true;const n=requests;const a=vm.runInContext('refreshBank({auto:true})'
 fail=true;await vm.runInContext("dispatch('start')",ctx);assert.equal(read('S.screen'),'opening');fail=false;waiting=true;
 vm.runInContext("S=fresh();S.screen='board';S.flow={kind:'arrival',due:Date.now()};S.players[1].path=['S',1]",ctx);
 const pending=vm.runInContext('advanceFlow()',ctx);vm.runInContext('pauseAll()',ctx);delayResolve();await pending;assert.equal(read('S.screen'),'board');assert.equal(read('S.paused'),true);assert.equal(read('S.flow.kind'),'arrival');
+waiting=false;
+// Broadcast-only refresh must work without an admin, and never publish or reveal answers early.
+vm.runInContext("hasControl=()=>false;publish=()=>{throw Error('viewer write');};S=fresh();S.screen='question';S.card={id:1};",ctx);
+rows[0][1]='역전칸!';rows[0][12]=50;reply=csv(rows);
+await vm.runInContext('refreshBank({auto:true})',ctx);
+assert.equal(read('S.bank[18].type'),'reverse');assert.equal(read('S.card.question'),'다음 도전용');assert.equal(read('S.card.answer'),'');
+vm.runInContext("S.bank=[];S.card={id:1};applyViewerBank()",ctx);
+assert.equal(read('S.bank.length'),29);assert.equal(read('S.card.answer'),'');
+vm.runInContext("S.screen='answer';applyViewerBank()",ctx);assert.equal(read('S.card.answer'),'떡국');
+const viewerBefore=read('S.bank');fail=true;await vm.runInContext('refreshBank({auto:true})',ctx);assert.deepEqual(read('S.bank'),viewerBefore);
 console.log('PASS: live sheet structure, free-text song, shot, fixed 29 IDs, changed active question/answer/points, preserved timer/scores, invalid/offline fallback, scored snapshot, single-flight/reset/pause races.');
 })().catch(e=>{console.error(e);process.exitCode=1});
