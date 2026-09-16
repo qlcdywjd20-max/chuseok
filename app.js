@@ -156,7 +156,7 @@ function parseBankCsv(text){
 let bankFlight=null,bankTransition=null,bankCheckedAt=0,viewerBank=null;
 // Public viewers only overlay sheet content locally; game state writes still require the admin lease.
 function applyViewerBank(){
- if(hasControl()||!viewerBank||viewerBank.source!==(S.bankSource||DEFAULT_BANK_URL))return;
+ if(mode!=='display'||hasControl()||!viewerBank||viewerBank.source!==(S.bankSource||DEFAULT_BANK_URL))return;
  S.bank=clone(viewerBank.rows).map(c=>({...c,answer:''}));
  const c=viewerBank.rows.find(c=>c.id===S.card?.id);
  if(c?.enabled&&!S.scored&&['intro','question','mission','chance','camera','answer'].includes(S.screen))S.card={...clone(c),answer:S.screen==='answer'?c.answer:''};
@@ -164,7 +164,7 @@ function applyViewerBank(){
 
 async function refreshBank(options={}){
  const controller=hasControl();
- if(!controller&&!options.auto)return false;
+ if(!controller&&(!options.auto||mode!=='display'))return false;
  if(bankFlight)return bankFlight;
  const manual=!options.auto;
  const source=(manual?$('apiUrl')?.value?.trim():null)||S.bankSource||DEFAULT_BANK_URL;

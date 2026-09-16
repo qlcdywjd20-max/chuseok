@@ -25,7 +25,7 @@ vm.runInContext("S=fresh();S.screen='board';S.flow={kind:'arrival',due:Date.now(
 const pending=vm.runInContext('advanceFlow()',ctx);vm.runInContext('pauseAll()',ctx);delayResolve();await pending;assert.equal(read('S.screen'),'board');assert.equal(read('S.paused'),true);assert.equal(read('S.flow.kind'),'arrival');
 waiting=false;
 // Broadcast-only refresh must work without an admin, and never publish or reveal answers early.
-vm.runInContext("hasControl=()=>false;publish=()=>{throw Error('viewer write');};S=fresh();S.screen='question';S.card={id:1};",ctx);
+vm.runInContext("mode='display';hasControl=()=>false;publish=()=>{throw Error('viewer write');};S=fresh();S.screen='question';S.card={id:1};",ctx);
 rows[0][1]='역전칸!';rows[0][12]=50;reply=csv(rows);
 await vm.runInContext('refreshBank({auto:true})',ctx);
 assert.equal(read('S.bank[18].type'),'reverse');assert.equal(read('S.card.question'),'다음 도전용');assert.equal(read('S.card.answer'),'');
