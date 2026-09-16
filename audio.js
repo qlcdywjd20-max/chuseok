@@ -1,9 +1,9 @@
 /* Local recordings only. Attribution and permitted uses: /audio/LICENSES.md. */
 function createFestivalAudio({document:doc, window:win, fallback=()=>{}}) {
   const make=(id,src,loop=false)=>{const a=doc.createElement('audio');a.id=id;a.src=src;a.loop=loop;a.preload='auto';a.hidden=true;doc.body.append(a);return a;};
-  const bgm=make('festivalBgm','/audio/festival-game.wav',true);
+  const bgm=make('festivalBgm','/audio/four-beers-polka.mp3',true);
   const success=make('festivalSuccess','/audio/correct-bell.wav');
-  const effects={success,applause:make('festivalApplause','/audio/applause.wav'),fanfare:make('festivalFanfare','/audio/fanfare.ogg')};
+  const effects={success,applause:make('festivalApplause','/audio/applause.wav'),fanfare:make('festivalFanfare','/audio/ta-da.mp3')};
   let activeEffect=null,effectToken=0;
   function stopEffects(){effectToken++;for(const a of Object.values(effects)){a.pause();a.currentTime=0;}activeEffect=null;restore();}
   let state={},unlocked=false,ducked=false,playing=false,restoreTimer=null,muted=false,controls=null;
